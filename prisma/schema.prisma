@@ -1,0 +1,129 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model doctores {
+  id_doctor          Int               @id @default(autoincrement())
+  uuid               String            @db.Uuid
+  id_usuario         Int               @unique
+  nombres            String            @db.VarChar(100)
+  apellido_paterno   String            @db.VarChar(100)
+  apellido_materno   String?           @db.VarChar(100)
+  cedula_profesional String?           @db.VarChar(50)
+  especialidad       String?           @db.VarChar(100)
+  telefono           String?           @db.VarChar(20)
+  direccion          String?           @db.VarChar(255)
+  created_at         DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?         @default(now()) @db.Timestamp(6)
+  usuarios           usuarios          @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction, map: "fk_usuario_doctor")
+  pacientes          pacientes[]
+  tests_rorschach    tests_rorschach[]
+}
+
+model emociones_detectadas {
+  id_emocion         Int                @id @default(autoincrement())
+  uuid               String             @db.Uuid
+  id_respuesta       Int
+  numero_captura     Int
+  emocion_detectada  String             @db.VarChar(50)
+  confianza          Float
+  timestamp_captura  DateTime?          @default(now()) @db.Timestamp(6)
+  created_at         DateTime?          @default(now()) @db.Timestamp(6)
+  respuestas_laminas respuestas_laminas @relation(fields: [id_respuesta], references: [id_respuesta], onDelete: Cascade, onUpdate: NoAction, map: "fk_respuesta_emocion")
+}
+
+model pacientes {
+  id_paciente             Int               @id @default(autoincrement())
+  uuid                    String            @db.Uuid
+  id_usuario              Int               @unique
+  id_doctor               Int
+  nombres                 String            @db.VarChar(100)
+  apellido_paterno        String            @db.VarChar(100)
+  apellido_materno        String?           @db.VarChar(100)
+  fecha_nacimiento        DateTime?         @db.Date
+  sexo                    tipo_sexo?
+  telefono                String?           @db.VarChar(20)
+  ocupacion               String?           @db.VarChar(100)
+  direccion               String?           @db.VarChar(255)
+  motivo_de_consulta      String?
+  observaciones_iniciales String?
+  condiciones_medicas     String?
+  medicamentos_actuales   String?
+  created_at              DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?         @default(now()) @db.Timestamp(6)
+  doctores                doctores          @relation(fields: [id_doctor], references: [id_doctor], onDelete: NoAction, onUpdate: NoAction, map: "fk_doctor_paciente")
+  usuarios                usuarios          @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction, map: "fk_usuario_paciente")
+  tests_rorschach         tests_rorschach[]
+}
+
+model respuestas_laminas {
+  id_respuesta              Int                    @id @default(autoincrement())
+  uuid                      String                 @db.Uuid
+  id_test                   Int
+  numero_lamina             Int
+  respuesta_texto           String
+  tiempo_respuesta_segundos Int?
+  emocion_predominante      String?                @db.VarChar(50)
+  total_capturas            Int?                   @default(0)
+  created_at                DateTime?              @default(now()) @db.Timestamp(6)
+  updated_at                DateTime?              @default(now()) @db.Timestamp(6)
+  emociones_detectadas      emociones_detectadas[]
+  tests_rorschach           tests_rorschach        @relation(fields: [id_test], references: [id_test], onDelete: Cascade, onUpdate: NoAction, map: "fk_test_respuesta")
+
+  @@unique([id_test, numero_lamina])
+}
+
+model tests_rorschach {
+  id_test            Int                  @id @default(autoincrement())
+  uuid               String               @db.Uuid
+  id_paciente        Int
+  id_doctor          Int
+  fecha_inicio       DateTime?            @db.Timestamp(6)
+  fecha_fin          DateTime?            @db.Timestamp(6)
+  status             tipo_status_test?    @default(PENDIENTE)
+  observaciones      String?
+  resultado_ia       Json?
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  respuestas_laminas respuestas_laminas[]
+  doctores           doctores             @relation(fields: [id_doctor], references: [id_doctor], onDelete: NoAction, onUpdate: NoAction, map: "fk_doctor_test")
+  pacientes          pacientes            @relation(fields: [id_paciente], references: [id_paciente], onDelete: NoAction, onUpdate: NoAction, map: "fk_paciente_test")
+}
+
+model usuarios {
+  id_usuario     Int        @id @default(autoincrement())
+  uuid           String     @db.Uuid
+  email          String     @unique @db.VarChar(150)
+  password       String     @db.VarChar(255)
+  rol            tipo_rol
+  estatus        Boolean?   @default(true)
+  fecha_registro DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?  @default(now()) @db.Timestamp(6)
+  doctores       doctores?
+  pacientes      pacientes?
+}
+
+enum tipo_rol {
+  ADMIN
+  DOCTOR
+  PACIENTE
+}
+
+enum tipo_sexo {
+  MASCULINO
+  FEMENINO
+  OTRO
+}
+
+enum tipo_status_test {
+  PENDIENTE
+  EN_PROCESO
+  FINALIZADO
+  CANCELADO
+}
