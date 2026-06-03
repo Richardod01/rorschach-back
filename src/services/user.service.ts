@@ -51,12 +51,7 @@ export class UserService {
     return userWithoutPassword;
   }
 
-  static async getDoctores() {
-    return prisma.usuarios.findMany({
-      where: { rol: 'DOCTOR' },
-      include: { doctores: true },
-    });
-  }
+
 
   static async getPacientes(id_doctor?: number) {
     const whereClause: any = { rol: 'PACIENTE' };

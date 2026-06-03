@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { TestModel } from '../models/test.model';
-import { RespuestaModel } from '../models/respuesta.model';
+import { RespuestaModel } from '../../models/respuesta.model';
+import { TestModel } from '../../models/test.model';
+
 
 export const crearTest = async (req: Request, res: Response): Promise<void> => {
   try {

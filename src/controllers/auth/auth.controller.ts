@@ -1,18 +1,5 @@
 import { Request, Response } from "express";
-import { AuthService } from "../services/auth.service";
-
-export const register = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const newUser = await AuthService.registerDoctor(req.body);
-    res
-      .status(201)
-      .json({ message: "Doctor registrado exitosamente", user: newUser });
-  } catch (error: any) {
-    res
-      .status(400)
-      .json({ message: "Error al registrar", error: error.message });
-  }
-};
+import { AuthService } from "../../services/auth.service";
 
 export const registerAdmin = async (
   req: Request,

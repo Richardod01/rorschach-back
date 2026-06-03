@@ -5,7 +5,7 @@ import {
   guardarRespuesta, 
   evaluarTest, 
   obtenerTestsPorUsuario 
-} from '../controllers/test.controller';
+} from '../controllers/test/test.controller';
 import { authenticate, requireRole } from '../middlewares/auth.middleware';
 
 const router = Router();
