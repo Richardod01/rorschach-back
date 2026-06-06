@@ -17,5 +17,29 @@ export const RegisterDoctorSchema = z.object({
     especialidad: z.enum(Especialidades, {
       message: "Especialidad no válida",
     }),
+    telefono: z.string().optional(),
+    
   }),
 });
+
+export type RegisterDoctorDto = z.infer<typeof RegisterDoctorSchema>["body"];
+
+export const UpdateDoctorSchema = z.object({
+  body: z.object({
+    nombres: z.string().min(1, "El nombre es requerido").optional(),
+    apellido_paterno: z.string().min(1, "El apellido paterno es requerido").optional(),
+    apellido_materno: z.string().optional(),
+    cedula_profesional: z
+      .string()
+      .min(7, "La cédula debe tener al menos 7 caracteres")
+      .max(8, "La cédula debe tener máximo 8 caracteres")
+      .optional(),
+    especialidad: z.enum(Especialidades, {
+      message: "Especialidad no válida",
+    }).optional(),
+    telefono: z.string().optional(),
+    direccion: z.string().optional(),
+  }),
+});
+
+export type UpdateDoctorDto = z.infer<typeof UpdateDoctorSchema>["body"];

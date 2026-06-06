@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { prisma } from "../database/prisma";
+import { prisma } from "../../database/prisma";
 import crypto from "crypto";
 
 const JWT_SECRET =
